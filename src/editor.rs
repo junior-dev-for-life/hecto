@@ -17,7 +17,7 @@ impl Editor {
         let _stdout = stdout().into_raw_mode().unwrap();
 
         loop {
-            if let Err(error) = refresh_screen() {
+            if let Err(error) = self.refresh_screen() {
                 die(error);
             }
             if self.should_quit {
@@ -29,7 +29,13 @@ impl Editor {
         }
     }
 
-
+    fn refresh_screen(&self) -> Result<(), std::io::Error> {
+        print!("{}{}", termion::clear::All, termion::cursor::Goto(1, 1));
+        if self.should_quit {
+            println!("Goodbye. \r");
+        }
+        io::stdout().flush()
+    }
 
     fn process_keypress(&mut self) -> Result<(), std::io::Error> {
         let pressed_key = read_key()?;
@@ -42,10 +48,6 @@ impl Editor {
     }
 }
 
-fn refresh_screen() -> Result<(), std::io::Error> {
-    print!("{}{}", termion::clear::All, termion::cursor::Goto(1, 1));
-    io::stdout().flush()
-}
 
 fn read_key() -> Result<Key, std::io::Error> {
     loop {
@@ -55,8 +57,7 @@ fn read_key() -> Result<Key, std::io::Error> {
     }
 }
 
-
-
 fn die(e: std::io::Error) {
+    print!("{}", termion::clear::All);
     panic!(e);
 }
