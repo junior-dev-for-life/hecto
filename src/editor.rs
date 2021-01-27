@@ -95,7 +95,7 @@ impl Editor {
     fn move_cursor(&mut self, key: Key) {
         let Position { mut y, mut x } = self.cursor_position;
         let height = self.document.len();
-        let width = if let Some(row) = self.document.row(y) {
+        let mut width = if let Some(row) = self.document.row(y) {
             row.len()
         } else {
             0
@@ -119,6 +119,16 @@ impl Editor {
             Key::Home => x = 0,
             Key::End => x = width,
             _ => ()
+        }
+
+        width = if let Some(row) = self.document.row(y) {
+            row.len()
+        } else {
+            0
+        };
+
+        if x > width {
+            x = width;
         }
 
         self.cursor_position = Position { x, y };
